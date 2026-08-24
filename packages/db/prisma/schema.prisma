@@ -1,0 +1,266 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TipoAsta {
+  chiamata
+  random
+  busta_chiusa
+  asta_live_ordine_listone
+  riparazione
+}
+
+enum ModalitaGioco {
+  classic
+  mantra
+}
+
+enum StatoSessioneAsta {
+  in_corso
+  completata
+}
+
+enum TipoAssegnatario {
+  utente
+  avversario
+}
+
+enum StatoSnapshot {
+  in_costruzione
+  consultabile
+  superato
+}
+
+enum EsitoIngestione {
+  successo
+  errore
+  limite_frequenza
+  timeout
+  dati_non_validi
+}
+
+model Utente {
+  id                 String          @id @default(uuid()) @db.Uuid
+  emailNormalizzata  String          @unique(map: "ux_utente_email_normalizzata") @map("email_normalizzata") @db.VarChar(254)
+  emailVisualizzata  String          @map("email_visualizzata") @db.VarChar(254)
+  passwordHash       String          @map("password_hash")
+  creatoIl           DateTime        @default(now()) @map("creato_il") @db.Timestamptz(3)
+  sessioniAuth       SessioneAuth[]
+  sessioniAsta       SessioneAsta[]
+
+  @@map("utente")
+}
+
+model SessioneAuth {
+  id                String    @id @default(uuid()) @db.Uuid
+  utenteId          String    @map("utente_id") @db.Uuid
+  tokenHash         String    @unique(map: "ux_sessione_auth_token_hash") @map("token_hash") @db.Char(64)
+  creatoIl          DateTime  @default(now()) @map("creato_il") @db.Timestamptz(3)
+  ultimaAttivitaIl  DateTime  @map("ultima_attivita_il") @db.Timestamptz(3)
+  scadeIlAssoluto   DateTime  @map("scade_il_assoluto") @db.Timestamptz(3)
+  revocataIl        DateTime? @map("revocata_il") @db.Timestamptz(3)
+  utente            Utente    @relation(fields: [utenteId], references: [id], onDelete: Cascade)
+
+  @@index([utenteId], map: "ix_sessione_auth_utente")
+  @@map("sessione_auth")
+}
+
+model SessioneAsta {
+  id                         String                    @id @default(uuid()) @db.Uuid
+  utenteId                   String                    @map("utente_id") @db.Uuid
+  nome                       String                    @db.VarChar(60)
+  stagioneListone            String                    @map("stagione_listone") @db.VarChar(20)
+  stato                      StatoSessioneAsta         @default(in_corso)
+  tipoAsta                   TipoAsta                  @map("tipo_asta")
+  modalitaGioco              ModalitaGioco             @map("modalita_gioco")
+  numeroPartecipanti         Int                       @map("numero_partecipanti")
+  creditiIniziali            Int                       @map("crediti_iniziali")
+  modificatoreDifesa         Boolean                   @default(false) @map("modificatore_difesa")
+  composizioneRosa           Json                      @map("composizione_rosa") @db.JsonB
+  quoteReparto               Json                      @map("quote_reparto") @db.JsonB
+  pesiValutazione            Json                      @map("pesi_valutazione") @db.JsonB
+  avvisiInformativiAttivi    Boolean                   @default(true) @map("avvisi_informativi_attivi")
+  creatoIl                   DateTime                  @default(now()) @map("creato_il") @db.Timestamptz(3)
+  aggiornatoIl               DateTime                  @default(now()) @updatedAt @map("aggiornato_il") @db.Timestamptz(3)
+  utente                     Utente                    @relation(fields: [utenteId], references: [id], onDelete: Cascade)
+  avversari                  Avversario[]
+  vociRegistroAcquisti       VoceRegistroAcquisti[]
+  obiettivi                  VoceObiettivo[]
+  consultazioniScheda        ConsultazioneScheda[]
+
+  @@unique([utenteId, nome], map: "ux_sessione_asta_utente_nome")
+  @@index([utenteId, aggiornatoIl], map: "ix_sessione_asta_utente_aggiornato")
+  @@map("sessione_asta")
+}
+
+model Avversario {
+  id                    String                    @id @default(uuid()) @db.Uuid
+  sessioneAstaId        String                    @map("sessione_asta_id") @db.Uuid
+  nome                  String                    @db.VarChar(30)
+  creatoIl              DateTime                  @default(now()) @map("creato_il") @db.Timestamptz(3)
+  aggiornatoIl          DateTime                  @default(now()) @updatedAt @map("aggiornato_il") @db.Timestamptz(3)
+  sessioneAsta          SessioneAsta              @relation(fields: [sessioneAstaId], references: [id], onDelete: Cascade)
+  vociRegistroAcquisti  VoceRegistroAcquisti[]
+
+  @@unique([sessioneAstaId, nome], map: "ux_avversario_sessione_nome")
+  @@map("avversario")
+}
+
+model VoceRegistroAcquisti {
+  id                            String              @id @default(uuid()) @db.Uuid
+  sessioneAstaId                String              @map("sessione_asta_id") @db.Uuid
+  ordinale                      Int
+  identificativoGiocatore      String              @map("identificativo_giocatore") @db.VarChar(128)
+  nomeGiocatore                 String              @map("nome_giocatore") @db.VarChar(100)
+  ruolo                         String              @db.VarChar(10)
+  squadra                       String              @db.VarChar(100)
+  repartoAssegnato              String              @map("reparto_assegnato") @db.VarChar(10)
+  macroReparto                  String              @map("macro_reparto") @db.VarChar(3)
+  prezzoAcquisto                Int?                @map("prezzo_acquisto")
+  assegnatarioTipo              TipoAssegnatario    @map("assegnatario_tipo")
+  avversarioId                  String?             @map("avversario_id") @db.Uuid
+  annullataIl                   DateTime?           @map("annullata_il") @db.Timestamptz(3)
+  chiaveIdempotenza             String              @map("chiave_idempotenza") @db.Uuid
+  giocatoreAssenteDatiCorrenti  Boolean             @default(false) @map("giocatore_assente_dati_correnti")
+  creatoIl                      DateTime            @default(now()) @map("creato_il") @db.Timestamptz(3)
+  aggiornatoIl                  DateTime            @default(now()) @updatedAt @map("aggiornato_il") @db.Timestamptz(3)
+  sessioneAsta                  SessioneAsta        @relation(fields: [sessioneAstaId], references: [id], onDelete: Cascade)
+  avversario                    Avversario?         @relation(fields: [avversarioId], references: [id], onDelete: SetNull)
+
+  @@unique([sessioneAstaId, ordinale], map: "ux_registro_sessione_ordinale")
+  @@unique([sessioneAstaId, chiaveIdempotenza], map: "ux_registro_idempotenza")
+  @@index([sessioneAstaId, identificativoGiocatore], map: "ix_registro_sessione_giocatore")
+  @@index([avversarioId], map: "ix_registro_avversario")
+  @@map("voce_registro_acquisti")
+}
+
+model VoceObiettivo {
+  id                         String         @id @default(uuid()) @db.Uuid
+  sessioneAstaId             String         @map("sessione_asta_id") @db.Uuid
+  identificativoGiocatore   String         @map("identificativo_giocatore") @db.VarChar(128)
+  nomeGiocatore              String         @map("nome_giocatore") @db.VarChar(100)
+  reparto                    String         @db.VarChar(10)
+  prezzoMassimoPersonale     Int?           @map("prezzo_massimo_personale")
+  priorita                   Int            @default(99)
+  nonRaggiungibile           Boolean        @default(false) @map("non_raggiungibile")
+  creatoIl                   DateTime       @default(now()) @map("creato_il") @db.Timestamptz(3)
+  aggiornatoIl               DateTime       @default(now()) @updatedAt @map("aggiornato_il") @db.Timestamptz(3)
+  sessioneAsta               SessioneAsta   @relation(fields: [sessioneAstaId], references: [id], onDelete: Cascade)
+
+  @@unique([sessioneAstaId, identificativoGiocatore], map: "ux_obiettivo_sessione_giocatore")
+  @@map("voce_obiettivo")
+}
+
+model ConsultazioneScheda {
+  id                         String         @id @default(uuid()) @db.Uuid
+  sessioneAstaId             String         @map("sessione_asta_id") @db.Uuid
+  identificativoGiocatore   String         @map("identificativo_giocatore") @db.VarChar(128)
+  istante                    DateTime       @default(now()) @db.Timestamptz(3)
+  sessioneAsta               SessioneAsta   @relation(fields: [sessioneAstaId], references: [id], onDelete: Cascade)
+
+  @@index([sessioneAstaId, identificativoGiocatore, istante], map: "ix_consultazione_sessione_giocatore")
+  @@map("consultazione_scheda")
+}
+
+model SnapshotDati {
+  id                      String                   @id @default(uuid()) @db.Uuid
+  stagioneListone         String                   @map("stagione_listone") @db.VarChar(20)
+  stagioneStatistiche     String                   @map("stagione_statistiche") @db.VarChar(20)
+  stato                   StatoSnapshot            @default(in_costruzione)
+  creatoIl                DateTime                 @default(now()) @map("creato_il") @db.Timestamptz(3)
+  numGiocatori            Int                      @map("num_giocatori")
+  nomeSorgenteListone     String                   @map("nome_sorgente_listone") @db.VarChar(100)
+  nomeSorgenteStatistiche String                   @map("nome_sorgente_statistiche") @db.VarChar(100)
+  hashContenuto           String                   @map("hash_contenuto") @db.Char(64)
+  giocatori               GiocatoreSnapshot[]
+  pubblicazione           PubblicazioneSnapshot?
+
+  @@index([stagioneListone, stato], map: "ix_snapshot_stagione_stato")
+  @@map("snapshot_dati")
+}
+
+model GiocatoreSnapshot {
+  snapshotId                 String         @map("snapshot_id") @db.Uuid
+  identificativoGiocatore   String         @map("identificativo_giocatore") @db.VarChar(128)
+  nome                       String         @db.VarChar(100)
+  nomeRicerca                String         @map("nome_ricerca") @db.VarChar(100)
+  squadra                    String         @db.VarChar(100)
+  ruoloClassic               String?        @map("ruolo_classic") @db.VarChar(1)
+  ruoliMantra                String[]       @map("ruoli_mantra")
+  quotazione                 Int
+  statFantacalcio            Json           @map("stat_fantacalcio") @db.JsonB
+  statTattiche               Json           @map("stat_tattiche") @db.JsonB
+  snapshot                   SnapshotDati   @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+
+  @@id([snapshotId, identificativoGiocatore], map: "pk_giocatore_snapshot")
+  @@index([snapshotId, nomeRicerca], map: "ix_giocatore_snapshot_ricerca")
+  @@map("giocatore_snapshot")
+}
+
+model PubblicazioneSnapshot {
+  stagioneListone  String         @id @map("stagione_listone") @db.VarChar(20)
+  snapshotId       String         @unique(map: "ux_pubblicazione_snapshot_id") @map("snapshot_id") @db.Uuid
+  pubblicatoIl     DateTime       @default(now()) @map("pubblicato_il") @db.Timestamptz(3)
+  snapshot         SnapshotDati   @relation(fields: [snapshotId], references: [id], onDelete: Restrict)
+
+  @@map("pubblicazione_snapshot")
+}
+
+model StatoFreschezza {
+  nomeSorgente                    String             @map("nome_sorgente") @db.VarChar(100)
+  stagione                        String             @db.VarChar(20)
+  ultimoSuccessoIl                DateTime?          @map("ultimo_successo_il") @db.Timestamptz(3)
+  ultimoTentativoIl               DateTime           @map("ultimo_tentativo_il") @db.Timestamptz(3)
+  ultimoEsito                     EsitoIngestione     @map("ultimo_esito")
+  dettaglioErrore                 String?            @map("dettaglio_errore")
+  numGiocatoriAcquisiti           Int?               @map("num_giocatori_acquisiti")
+  budgetToken                     Int                @default(0) @map("budget_token")
+  prossimoTentativoNonPrimaDi     DateTime?          @map("prossimo_tentativo_non_prima_di") @db.Timestamptz(3)
+  aggiornatoIl                    DateTime           @default(now()) @updatedAt @map("aggiornato_il") @db.Timestamptz(3)
+
+  @@id([nomeSorgente, stagione], map: "pk_stato_freschezza")
+  @@map("stato_freschezza")
+}
+
+model EsecuzioneIngestione {
+  id                      String             @id @default(uuid()) @db.Uuid
+  nomeSorgente            String             @map("nome_sorgente") @db.VarChar(100)
+  stagione                String             @db.VarChar(20)
+  iniziataIl              DateTime           @default(now()) @map("iniziata_il") @db.Timestamptz(3)
+  terminataIl             DateTime?          @map("terminata_il") @db.Timestamptz(3)
+  esito                   EsitoIngestione
+  numGiocatoriAcquisiti   Int?               @map("num_giocatori_acquisiti")
+  dettaglioErrore         String?            @map("dettaglio_errore")
+
+  @@index([nomeSorgente, stagione, iniziataIl], map: "ix_esecuzione_sorgente_stagione")
+  @@map("esecuzione_ingestione")
+}
+
+model AliasGiocatore {
+  id                         String    @id @default(uuid()) @db.Uuid
+  nomeSorgente               String    @map("nome_sorgente") @db.VarChar(100)
+  identificativoSorgente     String    @map("identificativo_sorgente") @db.VarChar(128)
+  nomeNormalizzato           String    @map("nome_normalizzato") @db.VarChar(100)
+  squadraNormalizzata        String    @map("squadra_normalizzata") @db.VarChar(100)
+  identificativoGiocatore    String?   @map("identificativo_giocatore") @db.VarChar(128)
+  creatoIl                   DateTime  @default(now()) @map("creato_il") @db.Timestamptz(3)
+  aggiornatoIl               DateTime  @default(now()) @updatedAt @map("aggiornato_il") @db.Timestamptz(3)
+
+  @@unique([nomeSorgente, identificativoSorgente], map: "ux_alias_sorgente_identificativo")
+  @@index([nomeNormalizzato, squadraNormalizzata], map: "ix_alias_nome_squadra")
+  @@map("alias_giocatore")
+}
+
+model LockIngestione {
+  chiave        String   @id @db.VarChar(100)
+  proprietario  String   @db.Uuid
+  acquisitoIl   DateTime @map("acquisito_il") @db.Timestamptz(3)
+  scadeIl       DateTime @map("scade_il") @db.Timestamptz(3)
+
+  @@index([scadeIl], map: "ix_lock_ingestione_scadenza")
+  @@map("lock_ingestione")
+}

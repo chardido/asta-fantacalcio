@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title description">
+  <title id="title">Asta Fantacalcio Companion</title>
+  <desc id="description">Pallone stilizzato su sfondo blu</desc>
+  <rect width="512" height="512" rx="96" fill="#1864ab"/>
+  <circle cx="256" cy="256" r="148" fill="#fff"/>
+  <path d="M256 162l58 42-22 68h-72l-22-68z" fill="#1864ab"/>
+  <path d="M256 108v54M116 220l82-16M396 220l-82-16M170 374l50-102M342 374l-50-102" fill="none" stroke="#1864ab" stroke-width="28" stroke-linecap="round"/>
+</svg>

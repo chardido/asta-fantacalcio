@@ -1,0 +1,51 @@
+{
+  "name": "@asta/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "next build",
+    "test": "vitest run --passWithNoTests",
+    "test:e2e": "playwright test --config playwright.config.ts",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "dev": "next dev",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@asta/contracts": "workspace:*",
+    "@asta/db": "workspace:*",
+    "@asta/domain": "workspace:*",
+    "@mantine/core": "9.5.2",
+    "@mantine/form": "9.5.2",
+    "@mantine/hooks": "9.5.2",
+    "@mantine/modals": "9.5.2",
+    "@mantine/notifications": "9.5.2",
+    "@node-rs/argon2": "2.0.2",
+    "@prisma/adapter-pg": "7.9.1",
+    "@tabler/icons-react": "3.46.0",
+    "@tanstack/react-query": "5.102.1",
+    "@trpc/client": "11.18.0",
+    "@trpc/server": "11.18.0",
+    "@trpc/tanstack-react-query": "11.18.0",
+    "idb": "8.0.3",
+    "next": "16.3.2",
+    "pg": "8.23.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "zod": "4.4.3",
+    "zustand": "5.0.15"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.52.0",
+    "@types/node": "22.20.1",
+    "@types/pg": "8.23.1",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "fake-indexeddb": "6.2.5",
+    "fast-check": "4.9.0",
+    "testcontainers": "12.1.0",
+    "typescript": "5.9.3",
+    "vitest": "4.1.11"
+  }
+}

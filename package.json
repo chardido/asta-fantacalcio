@@ -1,0 +1,24 @@
+{
+  "name": "asta-fantacalcio-companion",
+  "private": true,
+  "version": "0.0.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@11.23.0",
+  "scripts": {
+    "architecture": "node scripts/check-architecture.mjs && node --test tests/architecture/*.test.mjs",
+    "build": "pnpm run architecture && turbo run build",
+    "test": "pnpm run architecture && turbo run test",
+    "lint": "pnpm run architecture && turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "dev": "turbo run dev"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.9.0",
+    "turbo": "2.10.11",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.67.0"
+  }
+}
