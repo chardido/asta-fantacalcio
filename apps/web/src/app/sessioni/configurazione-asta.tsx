@@ -381,7 +381,7 @@ export function SchermataConfigurazioneAsta({
   const errore = erroreLocale ?? erroreEsterno;
 
   return (
-    <Container component="main" size="lg" py="xl">
+    <Container className="nocturne-page" component="main" size="lg" py="xl">
       <Stack gap="xl">
         <div>
           <Title order={1}>
@@ -405,7 +405,7 @@ export function SchermataConfigurazioneAsta({
           </Alert>
         )}
 
-        <Paper withBorder p="lg" radius="md">
+        <Paper className="nocturne-wizard" withBorder p="lg" radius="md">
           <Stepper active={passo} onStepClick={setPasso} allowNextStepsSelect={false}>
             <Stepper.Step label="Dati principali" description="Lega e modalità">
               <SimpleGrid cols={{ base: 1, sm: 2 }} mt="xl">
@@ -631,7 +631,7 @@ export function SchermataConfigurazioneAsta({
             </Stepper.Step>
           </Stepper>
 
-          <Group justify="space-between" mt="xl">
+          <Group className="nocturne-wizard-actions" justify="space-between" mt="xl">
             <Button disabled={passo === 0} onClick={() => setPasso((corrente) => Math.max(0, corrente - 1))} variant="default">
               Indietro
             </Button>

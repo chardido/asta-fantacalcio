@@ -260,9 +260,9 @@ export function SchermataListaObiettivi({
     prioritaValida;
 
   return (
-    <Container component="main" size="xl" py="xl">
+    <Container className="nocturne-page" component="main" size="xl" py="xl">
       <Stack gap="lg">
-        <Group align="flex-start" justify="space-between">
+        <Group className="nocturne-page-header" align="flex-start" justify="space-between">
           <div>
             <Group gap="xs">
               <IconTargetArrow aria-hidden size={28} />
@@ -389,7 +389,7 @@ export function SchermataListaObiettivi({
 
         <Paper component="section" p="md" withBorder>
           <Stack gap="md">
-            <Group align="flex-end" justify="space-between">
+            <Group className="nocturne-list-toolbar" align="flex-end" justify="space-between">
               <div>
                 <Title order={2} size="h3">Obiettivi perseguibili per reparto</Title>
                 <Group gap="xs" mt="xs">

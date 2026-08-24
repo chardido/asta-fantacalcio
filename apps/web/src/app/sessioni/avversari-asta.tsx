@@ -202,9 +202,9 @@ export function SchermataAvversariAsta({
         Number(prezzoAcquisto) <= creditiResiduiSelezionati));
 
   return (
-    <Container component="main" size="xl" py="xl">
+    <Container className="nocturne-page" component="main" size="xl" py="xl">
       <Stack gap="lg">
-        <Group align="flex-start" justify="space-between">
+        <Group className="nocturne-page-header" align="flex-start" justify="space-between">
           <div>
             <Title order={1}>Avversari</Title>
             <Text c="dimmed">

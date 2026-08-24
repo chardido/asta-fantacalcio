@@ -1,5 +1,6 @@
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
+import "./globals.css";
 
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
@@ -20,12 +21,13 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1864ab",
+  colorScheme: "dark",
+  themeColor: "#161826",
 };
 
 export default function RootLayout({ children }: { readonly children: ReactNode }) {
   return (
-    <html lang="it">
+    <html lang="it" data-mantine-color-scheme="dark">
       <body>
         <RegistratoreServiceWorker />
         <FornitoreTema>

@@ -35,7 +35,8 @@ function percentualeSlotResidui(slotResidui: number, slotTotali: number): number
 
 /**
  * Riepilogo persistente dello stato dell'asta, pensato per essere inserito
- * nell'AppShell della sessione. Usa esclusivamente primitive di layout Mantine.
+ * nell'AppShell della sessione. Il rail dei reparti scorre internamente e non
+ * aumenta mai la larghezza del documento.
  */
 export function BarraStatoAsta({
   budgetResiduo,
@@ -49,39 +50,43 @@ export function BarraStatoAsta({
       aria-live="polite"
       p="xs"
     >
-      <Stack gap="xs">
-        <Group gap="md" wrap="wrap">
-          <Group gap="xs">
-            <Text fw={600}>Budget residuo</Text>
-            <Badge color="blue" variant="filled">
+      <Stack gap={6}>
+        <SimpleGrid cols={3} spacing="xs" verticalSpacing={4}>
+          <Stack gap={0}>
+            <Text c="dimmed" fw={600} size="xs">Budget residuo</Text>
+            <Badge color="nocturne" size="lg" variant="filled">
               {budgetResiduo} crediti
             </Badge>
-          </Group>
-          <Group gap="xs">
-            <Text fw={600}>Slot residui totali</Text>
-            <Badge color={slotResiduiTotali === 0 ? "green" : "gray"} variant="light">
+          </Stack>
+          <Stack gap={0}>
+            <Text c="dimmed" fw={600} size="xs">Slot residui totali</Text>
+            <Badge color={slotResiduiTotali === 0 ? "green" : "gray"} size="lg" variant="light">
               {slotResiduiTotali}
             </Badge>
-          </Group>
+          </Stack>
           {operazioniInAttesa > 0 ? (
-            <Indicator
-              color="orange"
-              inline
-              label={operazioniInAttesa}
-              size={22}
-            >
-              <Badge
-                aria-label={`${operazioniInAttesa} operazioni in attesa di invio`}
+            <Stack gap={0}>
+              <Text c="dimmed" fw={600} size="xs">Sincronizzazione</Text>
+              <Indicator
                 color="orange"
-                size="lg"
-                variant="light"
+                inline
+                label={operazioniInAttesa}
+                size={20}
               >
-                Coda offline
-              </Badge>
-            </Indicator>
+                <Badge
+                  aria-label={`${operazioniInAttesa} operazioni in attesa di invio`}
+                  color="orange"
+                  size="lg"
+                  variant="light"
+                >
+                  Coda offline
+                </Badge>
+              </Indicator>
+            </Stack>
           ) : null}
-        </Group>
-        <SimpleGrid cols={{ base: 4, sm: 6, md: Math.max(1, reparti.length) }} spacing="xs">
+        </SimpleGrid>
+
+        <div className="nocturne-status-rail">
           {reparti.map((stato) => {
             const percentuale = percentualeSlotResidui(
               stato.slotResidui,
@@ -91,28 +96,27 @@ export function BarraStatoAsta({
             return (
               <Stack
                 aria-label={`Stato reparto ${stato.reparto}`}
-                gap={2}
+                className="nocturne-status-item"
+                gap={1}
                 key={stato.reparto}
               >
-                <Text fw={700} size="sm">
-                  {stato.reparto}
-                </Text>
-                <Text c="dimmed" size="xs">
-                  {stato.budgetResiduo} crediti
-                </Text>
+                <Group gap="xs" justify="space-between" wrap="nowrap">
+                  <Text fw={700} size="sm">{stato.reparto}</Text>
+                  <Text c="dimmed" size="xs">{stato.budgetResiduo} crediti</Text>
+                </Group>
                 <Text c="dimmed" size="xs">
                   {stato.slotResidui} slot residui
                 </Text>
                 <Progress
                   aria-label={`Slot residui ${stato.reparto}: ${stato.slotResidui} su ${stato.slotTotali}`}
-                  color={stato.slotResidui === 0 ? "green" : "blue"}
-                  size="sm"
+                  color={stato.slotResidui === 0 ? "green" : "nocturne"}
+                  size={5}
                   value={percentuale}
                 />
               </Stack>
             );
           })}
-        </SimpleGrid>
+        </div>
       </Stack>
     </AppShell.Header>
   );

@@ -277,7 +277,10 @@ function TabellaReparto({
       {sezione.voci.length === 0 ? (
         <Text c="dimmed">Nessun giocatore corrisponde ai filtri.</Text>
       ) : (
-        <Table.ScrollContainer minWidth={720}>
+        <Table.ScrollContainer
+          className="nocturne-responsive-player-table"
+          minWidth={720}
+        >
           <Table striped highlightOnHover>
             <Table.Thead>
               <Table.Tr>
@@ -292,7 +295,7 @@ function TabellaReparto({
             <Table.Tbody>
               {sezione.voci.map((voce) => (
                 <Table.Tr key={`${sezione.reparto}-${voce.id}`}>
-                  <Table.Td>
+                  <Table.Td data-label="Giocatore">
                     <Group gap="xs">
                       <Button variant="subtle" onClick={() => onSeleziona(voce.id)}>
                         {voce.nome}
@@ -300,11 +303,11 @@ function TabellaReparto({
                       {!voce.disponibile ? <Badge color="gray">Non disponibile</Badge> : null}
                     </Group>
                   </Table.Td>
-                  <Table.Td>{voce.squadra}</Table.Td>
-                  <Table.Td>{sezione.reparto}</Table.Td>
-                  <Table.Td>{voce.quotazione}</Table.Td>
-                  <Table.Td>{voce.prezzoMassimoConsigliato ?? "—"}</Table.Td>
-                  <Table.Td>
+                  <Table.Td data-label="Squadra">{voce.squadra}</Table.Td>
+                  <Table.Td data-label="Ruolo">{sezione.reparto}</Table.Td>
+                  <Table.Td data-label="Quotazione">{voce.quotazione}</Table.Td>
+                  <Table.Td data-label="Prezzo massimo">{voce.prezzoMassimoConsigliato ?? "—"}</Table.Td>
+                  <Table.Td data-label="Convenienza">
                     {voce.indice === null ? "—" : (
                       <IndicatoreConvenienza valore={voce.indice} dimensione={64} spessore={7} />
                     )}
@@ -363,14 +366,14 @@ export function SchermataDashboardAsta({ sessioneAstaId, configurazione, stato, 
   );
 
   return (
-    <Container component="main" size="xl" py="xl">
+    <Container className="nocturne-page" component="main" size="xl" py="xl">
       <Stack gap="lg">
-        <Group justify="space-between" align="flex-start">
+        <Group className="nocturne-page-header" justify="space-between" align="flex-start">
           <div>
             <Title order={1}>Dashboard asta</Title>
             <Text c="dimmed">I migliori giocatori per reparto, ricalcolati sullo stato corrente dell’asta.</Text>
           </div>
-          <Group gap="sm">
+          <Group className="nocturne-page-actions" gap="sm">
             <Button
               component={Link}
               href={`/sessioni/${encodeURIComponent(sessioneAstaId)}/trasferimento`}

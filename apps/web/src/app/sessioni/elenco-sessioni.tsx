@@ -115,9 +115,9 @@ export function ElencoSessioniAsta({
   }
 
   return (
-    <Container component="main" size="lg" py="xl">
+    <Container className="nocturne-page" component="main" size="lg" py="xl">
       <Stack gap="xl">
-        <Group justify="space-between" align="flex-start">
+        <Group className="nocturne-page-header" justify="space-between" align="flex-start">
           <div>
             <Title order={1}>Le tue sessioni d&apos;asta</Title>
             <Text c="dimmed" mt="xs">
@@ -158,7 +158,7 @@ export function ElencoSessioniAsta({
         {!caricamento && sessioni.length > 0 ? (
           <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
             {sessioni.map((sessione) => (
-              <Card key={sessione.id} withBorder padding="lg" radius="md">
+              <Card className="nocturne-session-card" key={sessione.id} withBorder padding="lg" radius="md">
                 <Stack gap="md">
                   <Group justify="space-between" align="flex-start" wrap="nowrap">
                     <div>

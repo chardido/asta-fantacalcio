@@ -30,7 +30,7 @@ export default function PaginaUscita() {
   }
 
   return (
-    <Container component="main" size={460} py="xl">
+    <Container className="nocturne-auth-shell" component="main" size={460}>
       <Stack gap="lg">
         <Title order={1}>Esci</Title>
         <Paper withBorder p="xl" radius="md">

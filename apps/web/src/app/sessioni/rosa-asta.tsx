@@ -237,11 +237,11 @@ export function SchermataRosaAsta({
   const sezioni = creaSezioniRosaAsta(configurazione, stato, dati);
 
   return (
-    <Container component="main" size="xl" py="xl">
+    <Container className="nocturne-page" component="main" size="xl" py="xl">
       <Stack gap="lg">
-        <Group justify="space-between" align="flex-start">
+        <Group className="nocturne-page-header" justify="space-between" align="flex-start">
           <div>
-            <Group gap="sm">
+            <Group className="nocturne-roster-heading" gap="sm">
               <Title order={1}>{completata ? "Riepilogo finale" : "La tua rosa"}</Title>
               <Badge color={completata ? "green" : "blue"} variant="light">
                 {completata ? "Sessione completata" : "Sessione in corso"}

@@ -12,7 +12,11 @@ export interface FornitoreTemaProps {
 
 export function FornitoreTema({ children }: FornitoreTemaProps) {
   return (
-    <MantineProvider theme={tema}>
+    <MantineProvider
+      defaultColorScheme="dark"
+      forceColorScheme="dark"
+      theme={tema}
+    >
       <Notifications position="top-right" />
       {children}
     </MantineProvider>

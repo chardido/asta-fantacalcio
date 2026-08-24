@@ -2,7 +2,7 @@ import { Anchor, Button, Container, Group, Stack, Text, Title } from "@mantine/c
 
 export default function HomePage() {
   return (
-    <Container component="main" size="sm" py="xl">
+    <Container className="nocturne-auth-shell" component="main" size="sm">
       <Stack gap="lg">
         <Title order={1}>Asta Fantacalcio Companion</Title>
         <Text c="dimmed">

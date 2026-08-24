@@ -61,7 +61,7 @@ export default function PaginaRegistrazione() {
   }
 
   return (
-    <Container component="main" size={460} py="xl">
+    <Container className="nocturne-auth-shell" component="main" size={460}>
       <Stack gap="lg">
         <Title order={1}>Crea il tuo account</Title>
         <Text c="dimmed">

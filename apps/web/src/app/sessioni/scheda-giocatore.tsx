@@ -303,7 +303,7 @@ export function ContenutoSchedaGiocatore({
 
   return (
     <Stack gap="lg">
-      <Group justify="space-between" align="flex-start">
+      <Group className="nocturne-sheet-heading" justify="space-between" align="flex-start">
         <div>
           <Title order={2}>{giocatore.nome}</Title>
           <Text c="dimmed">{giocatore.squadra} · {configurazione.modalitaGioco === "classic" ? giocatore.ruoloClassic : giocatore.ruoliMantra.join("/")}</Text>
@@ -405,7 +405,7 @@ export function ContenutoSchedaGiocatore({
       </section>
 
       {disponibile ? (
-        <Paper component="section" aria-label="Registra acquisto" p="md" withBorder>
+        <Paper className="nocturne-purchase-panel" component="section" aria-label="Registra acquisto" p="md" withBorder>
           <Stack gap="sm">
             <Title order={3} size="h4">Registra acquisto</Title>
             {configurazione.modalitaGioco === "mantra" ? (
@@ -479,7 +479,7 @@ export function SchedaGiocatore({
 }: SchedaGiocatoreProps) {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
-  const viewportStretto = useMediaQuery("(max-width: 48em)");
+  const viewportStretto = useMediaQuery("(max-width: 61.99em)");
   const scheda = useQuery({
     queryKey: chiaveQuerySessione(sessioneAstaId, "scheda-giocatore", identificativoGiocatore),
     queryFn: () => recuperaScheda(sessioneAstaId, identificativoGiocatore ?? ""),
@@ -608,11 +608,30 @@ export function SchedaGiocatore({
 
   const titolo = scheda.data?.giocatore.nome ?? "Scheda giocatore";
   return viewportStretto ? (
-    <Drawer opened={aperta} onClose={onClose} position="bottom" size="95%" title={titolo}>
+    <Drawer
+      classNames={{
+        body: "nocturne-sheet-body",
+        content: "nocturne-bottom-sheet",
+        header: "nocturne-sheet-header",
+      }}
+      onClose={onClose}
+      opened={aperta}
+      overlayProps={{ backgroundOpacity: 0.64, blur: 6 }}
+      position="bottom"
+      size="calc(100dvh - 24px)"
+      title={titolo}
+    >
       {contenuto}
     </Drawer>
   ) : (
-    <Modal opened={aperta} onClose={onClose} size="xl" title={titolo}>
+    <Modal
+      classNames={{ content: "nocturne-player-modal" }}
+      onClose={onClose}
+      opened={aperta}
+      overlayProps={{ backgroundOpacity: 0.64, blur: 6 }}
+      size="xl"
+      title={titolo}
+    >
       {contenuto}
     </Modal>
   );
