@@ -44,6 +44,21 @@ jobs:
       - name: Compila il worker e le sue dipendenze
         run: pnpm exec turbo run build --filter=@asta/worker
 
+      # Rende immediatamente evidente un build incompleto, invece di far
+      # emergere il problema come modulo non risolto in fase di esecuzione.
+      - name: Verifica gli artefatti di build
+        run: |
+          for artefatto in \
+            packages/contracts/dist/index.js \
+            packages/db/dist/index.js \
+            packages/domain/dist/index.js; do
+            if [ ! -f "$artefatto" ]; then
+              echo "Artefatto mancante: $artefatto" >&2
+              exit 1
+            fi
+            echo "OK $artefatto"
+          done
+
       - name: Esegui l'ingestione
         working-directory: apps/worker
         env:
