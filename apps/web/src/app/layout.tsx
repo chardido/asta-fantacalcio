@@ -1,6 +1,6 @@
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
-import "./globals.css";
+import "@/tema/globali.css";
 
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";

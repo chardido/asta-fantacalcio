@@ -1,0 +1,50 @@
+name: Ingestione giornaliera
+
+on:
+  # 03:00 UTC = 05:00 Europe/Rome in ora legale, 04:00 in ora solare.
+  # GitHub Actions non supporta i fusi orari, quindi si pianificano entrambe
+  # le ore e l'ingestione superflua termina come "non_necessario".
+  schedule:
+    - cron: "0 3 * * *"
+    - cron: "0 4 * * *"
+  workflow_dispatch:
+    inputs:
+      forza:
+        description: "Esegui l'ingestione ignorando il controllo di freschezza"
+        type: boolean
+        default: false
+
+# Evita esecuzioni sovrapposte lato CI; il lock su database resta autorevole.
+concurrency:
+  group: ingestione-giornaliera
+  cancel-in-progress: false
+
+jobs:
+  ingestione:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout del repository
+        uses: actions/checkout@v4
+
+      - name: Abilita pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Configura Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Installa le dipendenze
+        run: pnpm install --frozen-lockfile
+
+      - name: Esegui l'ingestione
+        working-directory: apps/worker
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          STAGIONE_LISTONE: ${{ vars.STAGIONE_LISTONE }}
+          STAGIONE_STATISTICHE: ${{ vars.STAGIONE_STATISTICHE }}
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+          FORZA_INGESTIONE: ${{ inputs.forza && '1' || '0' }}
+        run: pnpm run ingestione:una-volta

@@ -9,7 +9,8 @@
     "test": "vitest run --passWithNoTests",
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "dev": "tsx watch src/index.ts"
+    "dev": "tsx watch src/index.ts",
+    "ingestione:una-volta": "tsx src/esegui-ingestione-una-volta.ts"
   },
   "dependencies": {
     "@asta/adapters": "workspace:*",
