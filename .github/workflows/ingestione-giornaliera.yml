@@ -39,6 +39,11 @@ jobs:
       - name: Installa le dipendenze
         run: pnpm install --frozen-lockfile
 
+      # I package di workspace espongono dist/, quindi vanno compilati prima
+      # di eseguire il worker. Turbo costruisce anche le dipendenze a monte.
+      - name: Compila il worker e le sue dipendenze
+        run: pnpm exec turbo run build --filter=@asta/worker
+
       - name: Esegui l'ingestione
         working-directory: apps/worker
         env:
